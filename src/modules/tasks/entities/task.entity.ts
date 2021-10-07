@@ -2,7 +2,6 @@ import {
   ChildEntity,
   Column,
   Entity,
-  JoinTable,
   ManyToOne,
   PrimaryGeneratedColumn,
   TableInheritance,
@@ -10,7 +9,6 @@ import {
 import { TaskEntityType } from '../common/enum/taskentitytype.enum';
 import { TaskType } from '../common/enum/tasktype.enum';
 import { TeamEntity } from './team.entity';
-import { ManyToMany } from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity';
 
 @Entity('Task')
@@ -63,14 +61,13 @@ export class TaskEntity {
 }
 
 @ChildEntity(TaskEntityType.Personal)
-export class PersonalTaskEntity extends TaskEntity {}
+export class PersonalTaskEntity extends TaskEntity {
+  @ManyToOne(() => UserEntity, (user) => user.personaltask)
+  user: UserEntity;
+}
 
 @ChildEntity(TaskEntityType.Team)
 export class TeamTaskEntity extends TaskEntity {
   @ManyToOne(() => TeamEntity, (team) => team.task)
   team: TaskEntity;
-
-  @ManyToMany(() => UserEntity)
-  @JoinTable()
-  users: UserEntity[];
 }

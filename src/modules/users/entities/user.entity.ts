@@ -1,4 +1,5 @@
 import { MessageEntity } from 'src/modules/messages/entities/message.entity';
+import { PersonalTaskEntity } from 'src/modules/tasks/entities/task.entity';
 import { TeamUserEntity } from 'src/modules/tasks/entities/teamuser.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -60,4 +61,7 @@ export class UserEntity {
 
   @OneToMany(() => TeamUserEntity, (teamuser) => teamuser.team)
   teamuser: TeamUserEntity[];
+
+  @OneToMany(() => PersonalTaskEntity, (personaltask) => personaltask.user)
+  personaltask: PersonalTaskEntity[];
 }
