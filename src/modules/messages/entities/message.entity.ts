@@ -1,5 +1,5 @@
 import { TeamEntity } from 'src/modules/tasks/entities/team.entity';
-import { AccountEntity } from 'src/modules/users/entities/user.entity';
+import { UserEntity } from 'src/modules/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -38,6 +38,6 @@ export class MessageEntity {
   @ManyToOne(() => TeamEntity, (team) => team.message)
   team: TeamEntity;
 
-  @ManyToOne(() => AccountEntity, (user) => user.message)
-  user: AccountEntity;
+  @ManyToOne(() => UserEntity, (user) => user.message)
+  user: UserEntity;
 }

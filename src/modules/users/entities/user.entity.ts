@@ -1,9 +1,9 @@
 import { MessageEntity } from 'src/modules/messages/entities/message.entity';
+import { TeamUserEntity } from 'src/modules/tasks/entities/teamuser.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { TeamEntity } from '../../tasks/entities/team.entity';
 
-@Entity('Account')
-export class AccountEntity {
+@Entity('User')
+export class UserEntity {
   @PrimaryGeneratedColumn()
   pkAccount_Id: number;
 
@@ -41,33 +41,23 @@ export class AccountEntity {
   lastName: string;
 
   @Column({
-    name: 'PhoneNumber',
-    type: 'varchar',
-    length: 10,
-    nullable: false,
-    unique: true,
-  })
-  phoneNumber: string;
-
-  @Column({
-    name: 'Email',
-    type: 'varchar',
-    length: 40,
-    nullable: false,
-    unique: true,
-  })
-  email: string;
-
-  @Column({
     name: 'Description',
     type: 'text',
     nullable: true,
   })
   description: string;
 
+  @Column({
+    name: 'Active',
+    type: 'bool',
+    nullable: false,
+    default: true,
+  })
+  active: boolean;
+
   @OneToMany(() => MessageEntity, (message) => message.user)
   message: MessageEntity[];
 
-  @OneToMany(() => TeamEntity, (team) => team.user)
-  team: TeamEntity[];
+  @OneToMany(() => TeamUserEntity, (teamuser) => teamuser.team)
+  teamuser: TeamUserEntity[];
 }
