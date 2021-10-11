@@ -5,7 +5,7 @@ import { TaskController } from './controllers/task.controller';
 import { TeamController } from './controllers/team.controller';
 import { TeamService } from './services/team.service';
 import { UserRepository } from '../users/repositories/user.repository';
-import { TeamUserRepository } from './repositories/teamuser.repository';
+import { TeamUserRepository } from './repositories/team-user.repository';
 import {
   TaskRepository,
   PersonalTaskRepository,

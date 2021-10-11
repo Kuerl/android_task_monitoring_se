@@ -5,8 +5,10 @@ import { UserEntity } from '../../users/entities/user.entity';
 
 @Entity('Team_User')
 export class TeamUserEntity {
-  @PrimaryGeneratedColumn()
-  team_user_Id: number;
+  @PrimaryGeneratedColumn({
+    name: 'teamUserId',
+  })
+  teamUserId: number;
 
   @Column({
     name: 'MemberRole',

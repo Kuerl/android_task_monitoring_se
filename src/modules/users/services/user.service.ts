@@ -1,10 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
-import { RegisterUserDto } from '../common/dtos/register.dto';
 import { plainToClass } from 'class-transformer';
 import { UserEntity } from '../entities/user.entity';
-import { LoginDto } from '../common/dtos/login.dto';
-import { UpdateUserDto } from '../common/dtos/update.dto';
+import { LoginDto, RegisterUserDto, UpdateUserDto } from '../common/dtos';
 
 @Injectable()
 export class UserService {
@@ -21,7 +19,7 @@ export class UserService {
     return this.userRepository.save(plainUserData);
   }
 
-  async login(loginDto: LoginDto): Promise<any> {
+  async login(loginDto: LoginDto): Promise<{ login: boolean }> {
     const account = await this.userRepository.findOne({
       where: { username: loginDto.username },
     });
@@ -33,7 +31,7 @@ export class UserService {
 
   async getUserInformation(username: string): Promise<UserEntity> {
     const account = await this.userRepository.findOne({
-      where: { username: username },
+      where: { username },
     });
     return account;
   }
@@ -43,7 +41,7 @@ export class UserService {
     updateUserDto: UpdateUserDto,
   ): Promise<UserEntity> {
     const account = await this.userRepository.findOne({
-      where: { username: username },
+      where: { username },
     });
     return this.userRepository.save({
       ...account,
@@ -53,7 +51,7 @@ export class UserService {
 
   async deleteAccount(username: string): Promise<UserEntity> {
     const account = await this.userRepository.findOne({
-      where: { username: username },
+      where: { username },
     });
     account.active = false;
     return this.userRepository.save(account);

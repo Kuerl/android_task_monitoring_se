@@ -5,7 +5,7 @@ import { MemberRole } from '../common/enum/teamrole.enum';
 import { UserRepository } from '../../users/repositories/user.repository';
 import { TeamMember } from '../common/dtos/teammember.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { TeamUserRepository } from '../repositories/teamuser.repository';
+import { TeamUserRepository } from '../repositories/team-user.repository';
 import { TeamUserEntity } from '../entities/teamuser.entity';
 import { TeamEntity } from '../entities/team.entity';
 
@@ -88,7 +88,7 @@ export class TeamService {
       willBeCreateTeamUser,
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { user, team_user_Id, ...res } = teamUserCreated;
+    const { user, teamUserId, ...res } = teamUserCreated;
     return res;
   }
 

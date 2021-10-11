@@ -1,12 +1,24 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get, Post, Put } from '@nestjs/common';
 
 @Controller('task')
 export class TaskController {
-  @Post('personal/:username')
+  // PERSONAL TASK
+  @Post('personal')
   createAPersonalTask() {
     return;
   }
 
+  @Get('personal/:username')
+  getAllPersonalTask() {
+    return;
+  }
+
+  @Put('personal/')
+  editAPersonalTask() {
+    return;
+  }
+
+  // TEAM TASK
   @Post('team/:team_Id')
   createATaskOfTeam() {
     return;
