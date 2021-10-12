@@ -28,7 +28,6 @@ export class TeamController {
   @Post('/')
   createATeam(@Body() teamDto: TeamDto) {
     // This route creates a team with the username (in DTO) is the Admin (MemberRole)
-    // Not assign the member
     return this.teamService.createATeam(teamDto);
   }
 

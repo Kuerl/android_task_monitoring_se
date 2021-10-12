@@ -7,27 +7,20 @@ import { plainToClass } from 'class-transformer';
 
 @EntityRepository(TeamUserEntity)
 export class TeamUserRepository extends Repository<TeamUserEntity> {
-  async assignUserOfATeam(
-    memberRole: MemberRole,
-    teamData: TeamEntity,
-    userData: UserEntity,
-  ): Promise<TeamUserEntity[]> {
-    const teamUserObject = {
-      memberRole: memberRole,
-      team: teamData,
-      user: userData,
-    };
-    const plainTeamUser: TeamUserEntity = plainToClass(
-      TeamUserEntity,
-      teamUserObject,
-    );
-    return this.save([plainTeamUser]);
-  }
-
   async allUserOfATeam(teamQuery: TeamEntity): Promise<TeamUserEntity[]> {
     return this.find({
       relations: ['team', 'user'],
       where: { team: teamQuery },
     });
+  }
+
+  async createOwnerOfATeam(userData: UserEntity, teamData: TeamEntity) {
+    const createTeamUser = {
+      user: userData,
+      team: teamData,
+      memberRole: MemberRole.Admin,
+    };
+    const plainTeamUser = plainToClass(TeamUserEntity, createTeamUser);
+    return this.save(plainTeamUser);
   }
 }

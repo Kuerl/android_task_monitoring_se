@@ -6,11 +6,15 @@ import { UserEntity } from '../entities/user.entity';
 @EntityRepository(UserEntity)
 export class UserRepository extends Repository<UserEntity> {
   async userQueryByUsername(username: string): Promise<UserEntity> {
-    return this.findOne({
+    const userQuery = await this.findOne({
       where: {
         username: username,
       },
     });
+    if (userQuery) {
+      return userQuery;
+    }
+    throw new BadRequestException('Not Found');
   }
 
   async existedUser(username: string): Promise<ResponseUserData> {

@@ -53,27 +53,15 @@ export class TeamService {
   }
 
   async createATeam(teamDto: TeamDto): Promise<any> {
-    if (!(teamDto.memberRole in MemberRole)) {
-      throw new BadRequestException('Member Role is not valid');
-    }
     const userQuery = await this.userRepository.userQueryByUsername(
       teamDto.username,
     );
-    if (!userQuery) {
-      throw new BadRequestException('User is not existed');
-    }
     // Create team
     const createdTeam = await this.teamRepository.createATeam(teamDto);
     // Create team user owner
-    // const createdTeamUser =
-    await this.teamUserRepository.assignUserOfATeam(
-      teamDto.memberRole,
-      createdTeam,
-      userQuery,
-    );
+    await this.teamUserRepository.createOwnerOfATeam(userQuery, createdTeam);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    // const { user, teamUserId, ...res } = createdTeamUser;
-    return createdTeam;
+    return this.teamRepository.createATeam(teamDto);
   }
 
   async addMember(teamMember: TeamMember, team_Id: string): Promise<any> {
