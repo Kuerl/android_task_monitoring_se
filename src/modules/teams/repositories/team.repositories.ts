@@ -15,6 +15,20 @@ export class TeamRepository extends Repository<TeamEntity> {
     return this.save(willBeCreateTeam);
   }
 
+  async teamInformation(teamId: string): Promise<TeamEntity> {
+    const teamQuery = await this.findOne({
+      where: {
+        pkTeam_Id: teamId,
+      },
+    });
+    if (teamQuery) {
+      return teamQuery;
+    }
+    if (!teamQuery) {
+      throw new BadRequestException('Not Found');
+    }
+  }
+
   async allTeamByUserRelation(userEntity: UserEntity): Promise<TeamEntity[]> {
     const teamsQuery = await this.find({
       where: { user: userEntity },
@@ -24,13 +38,5 @@ export class TeamRepository extends Repository<TeamEntity> {
       return teamsQuery;
     }
     throw new BadRequestException('Not Found');
-  }
-
-  async teamByTeamId(teamId: string): Promise<TeamEntity> {
-    return this.findOne({
-      where: {
-        pkTeam_Id: teamId,
-      },
-    });
   }
 }

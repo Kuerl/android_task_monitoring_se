@@ -1,5 +1,4 @@
 import { TeamEntity } from '../../entities/team.entity';
-export class ResponseTeamInformation {
-  team: TeamEntity;
+export class ResponseTeamInformation extends TeamEntity {
   members: any[];
 }

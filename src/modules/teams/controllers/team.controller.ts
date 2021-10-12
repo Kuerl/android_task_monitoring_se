@@ -15,7 +15,7 @@ import { TeamMember } from '../common/dtos/teammember.dto';
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
-  @Get('user/:username')
+  @Get('user/:username') //*
   getTeamsByUsername(@Param('username') username: string) {
     return this.teamService.getTeamsByUsername(username);
   }
@@ -36,12 +36,12 @@ export class TeamController {
     return this.teamService.addMember(teamMember, team_Id);
   }
 
-  @Put(':team_Id')
+  @Put(':team_Id') //*
   reName(@Body() teamNameDto: TeamNameDto, @Param('team_Id') team_Id: string) {
     return this.teamService.reName(teamNameDto, team_Id);
   }
 
-  @Put(':team_Id/:username')
+  @Put(':team_Id/:username') //*
   changeMemberRole(
     @Body() teamMemberRole: TeamMemberRole,
     @Param('team_Id') team_Id: string,
@@ -50,7 +50,7 @@ export class TeamController {
     return this.teamService.changeMemberRole(teamMemberRole, team_Id, username);
   }
 
-  @Delete(':team_Id/:username')
+  @Delete(':team_Id/:username') //*
   deleteMember(
     @Param('team_Id') team_Id: string,
     @Param('username') username: string,

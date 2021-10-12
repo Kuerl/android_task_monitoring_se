@@ -27,10 +27,7 @@ export class TeamService {
 
   // By team_Id, return all information about team and member of this team.
   async getTeamInformation(team_Id: string): Promise<ResponseTeamInformation> {
-    const teamQuery = await this.teamRepository.teamByTeamId(team_Id);
-    if (!teamQuery) {
-      throw new BadRequestException('Team is not existed');
-    }
+    const teamQuery = await this.teamRepository.teamInformation(team_Id);
     const teamUserQuery = await this.teamUserRepository.allUserOfATeam(
       teamQuery,
     );
@@ -47,7 +44,7 @@ export class TeamService {
       this.teamInformation[i] = res2;
     }
     return {
-      team: teamQuery,
+      ...teamQuery,
       members: this.teamInformation,
     };
   }
@@ -64,18 +61,12 @@ export class TeamService {
     return this.teamRepository.createATeam(teamDto);
   }
 
-  async addMember(teamMember: TeamMember, team_Id: string): Promise<any> {
+  async addMember(teamMember: TeamMember, teamId: string): Promise<any> {
     const notValidUser = [];
     const memberAdded = [];
     const memberExisted = [];
-    const teamQuery = await this.teamRepository.findOne({
-      where: {
-        pkTeam_Id: team_Id,
-      },
-    });
-    if (!teamQuery) {
-      throw new BadRequestException('Team is not existed');
-    }
+
+    const teamQuery = await this.teamRepository.teamInformation(teamId);
     for (let i = 0; i < teamMember.username.length; i++) {
       const element = teamMember.username[i];
       const userQuery = await this.userRepository.findOne({
