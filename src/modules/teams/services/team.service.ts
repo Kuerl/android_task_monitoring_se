@@ -1,13 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { TeamRepository } from '../repositories/teams.repositories';
+import { TeamRepository } from '../repositories/team.repositories';
 import { TeamDto, TeamNameDto, TeamMemberRole } from '../common/dtos/team.dto';
 import { MemberRole } from '../common/enum/teamrole.enum';
 import { UserRepository } from '../../users/repositories/user.repository';
 import { TeamMember } from '../common/dtos/teammember.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { TeamUserRepository } from '../repositories/team-user.repository';
 import { TeamUserEntity } from '../entities/teamuser.entity';
 import { TeamEntity } from '../entities/team.entity';
+import { ResponseTeamInformation } from '../common/dtos/res-team-information.dto';
 
 @Injectable()
 export class TeamService {
@@ -20,32 +20,22 @@ export class TeamService {
   ) {}
 
   // By username, return all teams that this member exist.
-  async getTeamsByUserId(username: string): Promise<TeamUserEntity[]> {
-    const userQuery = await this.userRepository.findOne({
-      where: { username: username },
-    });
-    const teamUserQuery = await this.teamUserRepository.find({
-      where: { user: userQuery },
-      relations: ['team'],
-    });
-    return teamUserQuery;
+  async getTeamsByUsername(username: string): Promise<TeamEntity[]> {
+    const userQuery = await this.userRepository.userQueryByUsername(username);
+    return this.teamRepository.allTeamByUserRelation(userQuery);
   }
 
   // By team_Id, return all information about team and member of this team.
-  async getTeamInformation(team_Id: string): Promise<any> {
-    const teamQuery = await this.teamRepository.findOne({
-      where: {
-        pkTeam_Id: team_Id,
-      },
-    });
+  async getTeamInformation(team_Id: string): Promise<ResponseTeamInformation> {
+    const teamQuery = await this.teamRepository.teamByTeamId(team_Id);
     if (!teamQuery) {
       throw new BadRequestException('Team is not existed');
     }
-    const teamUserQuery = await this.teamUserRepository.find({
-      relations: ['team', 'user'],
-      where: { team: teamQuery },
-    });
+    const teamUserQuery = await this.teamUserRepository.allUserOfATeam(
+      teamQuery,
+    );
     this.teamInformation = [];
+    // Remove password from the response data
     for (let i = 0; i < teamUserQuery.length; i++) {
       const element = teamUserQuery[i];
       this.teamInformation.push(element);
@@ -66,30 +56,24 @@ export class TeamService {
     if (!(teamDto.memberRole in MemberRole)) {
       throw new BadRequestException('Member Role is not valid');
     }
-    const pkUuid = uuidv4();
-    const userQuery = await this.userRepository.findOne({
-      where: { username: teamDto.username },
-    });
+    const userQuery = await this.userRepository.userQueryByUsername(
+      teamDto.username,
+    );
     if (!userQuery) {
       throw new BadRequestException('User is not existed');
     }
     // Create team
-    const willBeCreateTeam = this.teamRepository.create(teamDto);
-    willBeCreateTeam.pkTeam_Id = pkUuid;
-    await this.teamRepository.save(willBeCreateTeam);
+    const createdTeam = await this.teamRepository.createATeam(teamDto);
     // Create team user owner
-    const plainTeamUser = {
-      memberRole: teamDto.memberRole,
-      team: willBeCreateTeam,
-      user: userQuery,
-    };
-    const willBeCreateTeamUser = this.teamUserRepository.create(plainTeamUser);
-    const teamUserCreated = await this.teamUserRepository.save(
-      willBeCreateTeamUser,
+    // const createdTeamUser =
+    await this.teamUserRepository.assignUserOfATeam(
+      teamDto.memberRole,
+      createdTeam,
+      userQuery,
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { user, teamUserId, ...res } = teamUserCreated;
-    return res;
+    // const { user, teamUserId, ...res } = createdTeamUser;
+    return createdTeam;
   }
 
   async addMember(teamMember: TeamMember, team_Id: string): Promise<any> {

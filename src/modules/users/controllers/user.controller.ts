@@ -43,4 +43,9 @@ export class UserController {
   deleteAccount(@Param('username') username: string) {
     return this.userService.deleteAccount(username);
   }
+
+  @Get('reactive/:username')
+  reactiveAccount(@Param('username') username: string) {
+    return this.userService.reactiveAccount(username);
+  }
 }

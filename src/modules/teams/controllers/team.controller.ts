@@ -16,8 +16,8 @@ export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @Get('t/:username')
-  getTeamsByUserId(@Param('username') username: string) {
-    return this.teamService.getTeamsByUserId(username);
+  getTeamsByUsername(@Param('username') username: string) {
+    return this.teamService.getTeamsByUsername(username);
   }
 
   @Get(':team_Id')
