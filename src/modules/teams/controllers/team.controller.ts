@@ -15,7 +15,7 @@ import { TeamMember } from '../common/dtos/teammember.dto';
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
-  @Get('t/:username')
+  @Get('user/:username')
   getTeamsByUsername(@Param('username') username: string) {
     return this.teamService.getTeamsByUsername(username);
   }
