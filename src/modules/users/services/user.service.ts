@@ -9,9 +9,9 @@ export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
   async register(registerUserDto: RegisterUserDto): Promise<UserEntity> {
-    const existedInformation = await this.userRepository.findOne({
-      where: { username: registerUserDto.username },
-    });
+    const existedInformation = await this.userRepository.userQueryByUsername(
+      registerUserDto.username,
+    );
     if (existedInformation) {
       throw new BadRequestException('Existed Account Information');
     }
@@ -19,20 +19,19 @@ export class UserService {
     return this.userRepository.save(plainUserData);
   }
 
+  // All functions is not contain the authentication guard
   async login(loginDto: LoginDto): Promise<{ login: boolean }> {
-    const account = await this.userRepository.findOne({
-      where: { username: loginDto.username },
-    });
+    const account = await this.userRepository.userQueryByUsername(
+      loginDto.username,
+    );
     if (account && account.password === loginDto.password) {
       return { login: true };
     }
-    throw new BadRequestException('Login Fail');
+    return { login: false };
   }
 
   async getUserInformation(username: string): Promise<UserEntity> {
-    const account = await this.userRepository.findOne({
-      where: { username },
-    });
+    const account = await this.userRepository.userQueryByUsername(username);
     return account;
   }
 
@@ -40,9 +39,7 @@ export class UserService {
     username: string,
     updateUserDto: UpdateUserDto,
   ): Promise<UserEntity> {
-    const account = await this.userRepository.findOne({
-      where: { username },
-    });
+    const account = await this.userRepository.userQueryByUsername(username);
     return this.userRepository.save({
       ...account,
       ...updateUserDto,
@@ -50,9 +47,7 @@ export class UserService {
   }
 
   async deleteAccount(username: string): Promise<UserEntity> {
-    const account = await this.userRepository.findOne({
-      where: { username },
-    });
+    const account = await this.userRepository.userQueryByUsername(username);
     account.active = false;
     return this.userRepository.save(account);
   }
