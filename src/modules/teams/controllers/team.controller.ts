@@ -36,12 +36,12 @@ export class TeamController {
     return this.teamService.addMember(teamMember, team_Id);
   }
 
-  @Put(':team_Id') //*
+  @Put(':team_Id')
   reName(@Body() teamNameDto: TeamNameDto, @Param('team_Id') team_Id: string) {
     return this.teamService.reName(teamNameDto, team_Id);
   }
 
-  @Put(':team_Id/:username') //*
+  @Put(':team_Id/:username')
   changeMemberRole(
     @Body() teamMemberRole: TeamMemberRole,
     @Param('team_Id') team_Id: string,

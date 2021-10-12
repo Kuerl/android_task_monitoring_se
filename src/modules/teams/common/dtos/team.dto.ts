@@ -17,4 +17,7 @@ export class TeamNameDto {
 export class TeamMemberRole {
   @IsString()
   memberRole: MemberRole;
+  @IsString()
+  @Length(5, 20, { message: 'Invalid Username' })
+  username: string; // For the admin
 }

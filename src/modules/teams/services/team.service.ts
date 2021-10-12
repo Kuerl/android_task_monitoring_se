@@ -102,49 +102,42 @@ export class TeamService {
     };
   }
 
-  async reName(teamNameDto: TeamNameDto, team_Id: string): Promise<TeamEntity> {
-    const teamQuery = await this.teamRepository.findOne({
-      where: {
-        pkTeam_Id: team_Id,
-      },
-    });
-    if (!teamQuery) {
-      throw new BadRequestException('Team is not existed');
-    }
+  async reName(teamNameDto: TeamNameDto, teamId: string): Promise<TeamEntity> {
+    const teamQuery = await this.teamRepository.teamInformation(teamId);
     teamQuery.teamName = teamNameDto.teamName;
     return this.teamRepository.save(teamQuery);
   }
 
   async changeMemberRole(
     teamMemberRole: TeamMemberRole,
-    team_Id: string,
+    teamId: string,
     username: string,
   ): Promise<TeamUserEntity> {
-    const teamQuery = await this.teamRepository.findOne({
-      where: {
-        pkTeam_Id: team_Id,
-      },
-    });
-    if (!teamQuery) {
-      throw new BadRequestException('Team is not existed');
-    }
-    const userQuery = await this.userRepository.findOne({
-      where: { username: username },
-    });
-    if (!userQuery) {
-      throw new BadRequestException('User is not existed');
-    }
-    if (!(teamMemberRole.memberRole in MemberRole)) {
+    if (teamMemberRole.memberRole === MemberRole.Admin) {
       throw new BadRequestException('Invalid Member Role');
     }
+    const teamQuery = await this.teamRepository.teamInformation(teamId);
+    const ownerQuery = await this.userRepository.userQueryByUsername(username);
+    const userQuery = await this.userRepository.userQueryByUsername(
+      teamMemberRole.username,
+    );
     const willBeUpdatedTeamUser = await this.teamUserRepository.findOne({
       where: {
         user: userQuery,
         team: teamQuery,
       },
     });
-    willBeUpdatedTeamUser.memberRole = teamMemberRole.memberRole;
-    return this.teamUserRepository.save(willBeUpdatedTeamUser);
+    const owenerCheck = await this.teamUserRepository.findOne({
+      where: {
+        user: ownerQuery,
+        team: teamQuery,
+      },
+    });
+    if (owenerCheck.memberRole === MemberRole.Admin) {
+      willBeUpdatedTeamUser.memberRole = teamMemberRole.memberRole;
+      return this.teamUserRepository.save(willBeUpdatedTeamUser);
+    }
+    throw new BadRequestException('No effect member role');
   }
 
   async deleteMember(team_Id: string, username: string): Promise<any> {
