@@ -1,4 +1,4 @@
-import { TeamEntity } from 'src/modules/tasks/entities/team.entity';
+import { TeamEntity } from 'src/modules/teams/entities/team.entity';
 import { UserEntity } from 'src/modules/users/entities/user.entity';
 import {
   Column,

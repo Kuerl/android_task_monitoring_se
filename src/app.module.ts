@@ -3,9 +3,10 @@ import { DatabaseModule } from './modules/infrastructure/database/database.modul
 import { UserModule } from './modules/users/user.module';
 import { MessageModule } from './modules/messages/message.module';
 import { TaskModule } from './modules/tasks/task.module';
+import { TeamModule } from './modules/teams/team.module';
 
 @Module({
-  imports: [DatabaseModule, TaskModule, MessageModule, UserModule],
+  imports: [DatabaseModule, TaskModule, MessageModule, UserModule, TeamModule],
   controllers: [],
   providers: [],
 })
