@@ -1,7 +1,7 @@
 import {
   Body,
   Controller,
-  Delete,
+  // Delete,
   Get,
   Param,
   Post,
@@ -50,11 +50,11 @@ export class TeamController {
     return this.teamService.changeMemberRole(teamMemberRole, team_Id, username);
   }
 
-  @Delete(':team_Id/:username') //*
-  deleteMember(
-    @Param('team_Id') team_Id: string,
-    @Param('username') username: string,
-  ) {
-    return this.teamService.deleteMember(team_Id, username);
-  }
+  // @Delete(':team_Id/:username')
+  // deleteMember(
+  //   @Param('team_Id') team_Id: string,
+  //   @Param('username') username: string,
+  // ) {
+  //   return this.teamService.deleteMember(team_Id, username);
+  // }
 }

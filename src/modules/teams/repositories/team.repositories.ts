@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
 import { TeamEntity } from '../entities/team.entity';
-import { UserEntity } from '../../users/entities/user.entity';
+// import { UserEntity } from '../../users/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { TeamDto } from '../common/dtos/team.dto';
 
@@ -27,16 +27,5 @@ export class TeamRepository extends Repository<TeamEntity> {
     if (!teamQuery) {
       throw new BadRequestException('Not Found');
     }
-  }
-
-  async allTeamByUserRelation(userEntity: UserEntity): Promise<TeamEntity[]> {
-    const teamsQuery = await this.find({
-      where: { user: userEntity },
-      relations: ['team'],
-    });
-    if (teamsQuery) {
-      return teamsQuery;
-    }
-    throw new BadRequestException('Not Found');
   }
 }

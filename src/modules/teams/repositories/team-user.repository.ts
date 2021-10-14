@@ -4,6 +4,7 @@ import { TeamEntity } from '../entities/team.entity';
 import { MemberRole } from '../common/enum/teamrole.enum';
 import { UserEntity } from '../../users/entities/user.entity';
 import { plainToClass } from 'class-transformer';
+import { BadRequestException } from '@nestjs/common';
 
 @EntityRepository(TeamUserEntity)
 export class TeamUserRepository extends Repository<TeamUserEntity> {
@@ -14,6 +15,20 @@ export class TeamUserRepository extends Repository<TeamUserEntity> {
     });
   }
 
+  async getATeamUser(
+    user: UserEntity,
+    team: TeamEntity,
+  ): Promise<TeamUserEntity> {
+    const userTeamEntity = await this.findOne({
+      user,
+      team,
+    });
+    if (userTeamEntity) {
+      return userTeamEntity;
+    }
+    throw new BadRequestException('Not Found');
+  }
+
   async createOwnerOfATeam(userData: UserEntity, teamData: TeamEntity) {
     const createTeamUser = {
       user: userData,
@@ -22,5 +37,18 @@ export class TeamUserRepository extends Repository<TeamUserEntity> {
     };
     const plainTeamUser = plainToClass(TeamUserEntity, createTeamUser);
     return this.save(plainTeamUser);
+  }
+
+  async allTeamByUserRelation(
+    userEntity: UserEntity,
+  ): Promise<TeamUserEntity[]> {
+    const teamsQuery = await this.find({
+      where: { user: userEntity },
+      relations: ['team'],
+    });
+    if (teamsQuery) {
+      return teamsQuery;
+    }
+    throw new BadRequestException('Not Found');
   }
 }

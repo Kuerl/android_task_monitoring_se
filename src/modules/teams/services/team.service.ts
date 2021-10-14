@@ -8,6 +8,7 @@ import { TeamUserRepository } from '../repositories/team-user.repository';
 import { TeamUserEntity } from '../entities/teamuser.entity';
 import { TeamEntity } from '../entities/team.entity';
 import { ResponseTeamInformation } from '../common/dtos/res-team-information.dto';
+import { ResponseEffect } from '../common/dtos/res-effect.dto';
 
 @Injectable()
 export class TeamService {
@@ -20,9 +21,9 @@ export class TeamService {
   ) {}
 
   // By username, return all teams that this member exist.
-  async getTeamsByUsername(username: string): Promise<TeamEntity[]> {
+  async getTeamsByUsername(username: string): Promise<any> {
     const userQuery = await this.userRepository.userQueryByUsername(username);
-    return this.teamRepository.allTeamByUserRelation(userQuery);
+    return this.teamUserRepository.allTeamByUserRelation(userQuery);
   }
 
   // By team_Id, return all information about team and member of this team.
@@ -76,12 +77,10 @@ export class TeamService {
         notValidUser.push(element);
         continue;
       }
-      const memberExistedTeamUser = await this.teamUserRepository.findOne({
-        where: {
-          user: userQuery,
-          team: teamQuery,
-        },
-      });
+      const memberExistedTeamUser = await this.teamUserRepository.getATeamUser(
+        userQuery,
+        teamQuery,
+      );
       if (memberExistedTeamUser) {
         memberExisted.push(element);
         continue;
@@ -121,18 +120,14 @@ export class TeamService {
     const userQuery = await this.userRepository.userQueryByUsername(
       teamMemberRole.username,
     );
-    const willBeUpdatedTeamUser = await this.teamUserRepository.findOne({
-      where: {
-        user: userQuery,
-        team: teamQuery,
-      },
-    });
-    const owenerCheck = await this.teamUserRepository.findOne({
-      where: {
-        user: ownerQuery,
-        team: teamQuery,
-      },
-    });
+    const willBeUpdatedTeamUser = await this.teamUserRepository.getATeamUser(
+      userQuery,
+      teamQuery,
+    );
+    const owenerCheck = await this.teamUserRepository.getATeamUser(
+      ownerQuery,
+      teamQuery,
+    );
     if (owenerCheck.memberRole === MemberRole.Admin) {
       willBeUpdatedTeamUser.memberRole = teamMemberRole.memberRole;
       return this.teamUserRepository.save(willBeUpdatedTeamUser);
@@ -140,27 +135,20 @@ export class TeamService {
     throw new BadRequestException('No effect member role');
   }
 
-  async deleteMember(team_Id: string, username: string): Promise<any> {
-    const userQuery = await this.userRepository.findOne({
-      where: { username: username },
-    });
-    if (!userQuery) {
-      throw new BadRequestException('User is not existed');
+  async deleteMember(
+    teamId: string,
+    username: string,
+  ): Promise<ResponseEffect> {
+    const userQuery = await this.userRepository.userQueryByUsername(username);
+    const teamQuery = await this.teamRepository.teamInformation(teamId);
+    const willBeDeleteTeamUser = await this.teamUserRepository.getATeamUser(
+      userQuery,
+      teamQuery,
+    );
+    if (willBeDeleteTeamUser.memberRole !== MemberRole.Admin) {
+      this.teamUserRepository.delete(willBeDeleteTeamUser);
+      return { effect: true };
     }
-    const teamQuery = await this.teamRepository.findOne({
-      where: {
-        pkTeam_Id: team_Id,
-      },
-    });
-    if (!teamQuery) {
-      throw new BadRequestException('Team is not existed');
-    }
-    const willBeDeleteTeamUser = await this.teamUserRepository.findOne({
-      where: {
-        user: userQuery,
-        team: teamQuery,
-      },
-    });
-    return this.teamUserRepository.delete(willBeDeleteTeamUser);
+    throw new BadRequestException('Invalid Request');
   }
 }
