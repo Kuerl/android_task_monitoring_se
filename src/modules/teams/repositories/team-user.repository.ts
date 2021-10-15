@@ -9,10 +9,12 @@ import { BadRequestException } from '@nestjs/common';
 @EntityRepository(TeamUserEntity)
 export class TeamUserRepository extends Repository<TeamUserEntity> {
   async allUserOfATeam(teamQuery: TeamEntity): Promise<TeamUserEntity[]> {
-    return this.find({
+    const a = await this.find({
       relations: ['team', 'user'],
       where: { team: teamQuery },
     });
+    console.log(a);
+    return a;
   }
 
   async getATeamUser(
@@ -23,10 +25,7 @@ export class TeamUserRepository extends Repository<TeamUserEntity> {
       user,
       team,
     });
-    if (userTeamEntity) {
-      return userTeamEntity;
-    }
-    throw new BadRequestException('Not Found');
+    return userTeamEntity;
   }
 
   async createOwnerOfATeam(userData: UserEntity, teamData: TeamEntity) {

@@ -24,8 +24,6 @@ export class TeamRepository extends Repository<TeamEntity> {
     if (teamQuery) {
       return teamQuery;
     }
-    if (!teamQuery) {
-      throw new BadRequestException('Not Found');
-    }
+    throw new BadRequestException('Not Found');
   }
 }

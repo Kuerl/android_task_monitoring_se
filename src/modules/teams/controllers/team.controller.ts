@@ -1,7 +1,7 @@
 import {
   Body,
   Controller,
-  // Delete,
+  Delete,
   Get,
   Param,
   Post,
@@ -15,7 +15,7 @@ import { TeamMember } from '../common/dtos/teammember.dto';
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
-  @Get('user/:username') //*
+  @Get('user/:username')
   getTeamsByUsername(@Param('username') username: string) {
     return this.teamService.getTeamsByUsername(username);
   }
@@ -50,11 +50,20 @@ export class TeamController {
     return this.teamService.changeMemberRole(teamMemberRole, team_Id, username);
   }
 
-  // @Delete(':team_Id/:username')
-  // deleteMember(
-  //   @Param('team_Id') team_Id: string,
-  //   @Param('username') username: string,
-  // ) {
-  //   return this.teamService.deleteMember(team_Id, username);
-  // }
+  @Delete(':team_Id/:username/duser/:delusername')
+  deleteMember(
+    @Param('team_Id') team_Id: string,
+    @Param('username') username: string,
+    @Param('delusername') delusername: string,
+  ) {
+    return this.teamService.deleteMember(team_Id, username, delusername);
+  }
+
+  @Delete(':teamId/out/:username')
+  outTeam(
+    @Param('teamId') teamId: string,
+    @Param('username') username: string,
+  ) {
+    return this.teamService.outTeam(teamId, username);
+  }
 }

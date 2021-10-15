@@ -33,6 +33,7 @@ export class TeamService {
       teamQuery,
     );
     this.teamInformation = [];
+    console.log(teamUserQuery);
     // Remove password from the response data
     for (let i = 0; i < teamUserQuery.length; i++) {
       const element = teamUserQuery[i];
@@ -128,6 +129,9 @@ export class TeamService {
       ownerQuery,
       teamQuery,
     );
+    if (!willBeUpdatedTeamUser || !owenerCheck) {
+      throw new BadRequestException('Not Found');
+    }
     if (owenerCheck.memberRole === MemberRole.Admin) {
       willBeUpdatedTeamUser.memberRole = teamMemberRole.memberRole;
       return this.teamUserRepository.save(willBeUpdatedTeamUser);
@@ -138,17 +142,41 @@ export class TeamService {
   async deleteMember(
     teamId: string,
     username: string,
+    delusername: string,
   ): Promise<ResponseEffect> {
+    const userQuery = await this.userRepository.userQueryByUsername(username);
+    const teamQuery = await this.teamRepository.teamInformation(teamId);
+    const delusernameQuery = await this.userRepository.userQueryByUsername(
+      delusername,
+    );
+    const willBeDeleteOwnerTeamUser =
+      await this.teamUserRepository.getATeamUser(userQuery, teamQuery);
+    if (!willBeDeleteOwnerTeamUser) {
+      throw new BadRequestException('Not Found');
+    }
+    if (willBeDeleteOwnerTeamUser.memberRole !== MemberRole.Admin) {
+      return { effect: false };
+    } else {
+      const willBeDeleteTeamUser = await this.teamUserRepository.getATeamUser(
+        delusernameQuery,
+        teamQuery,
+      );
+      this.teamUserRepository.delete(willBeDeleteTeamUser);
+      return { effect: true };
+    }
+  }
+
+  async outTeam(teamId: string, username: string) {
     const userQuery = await this.userRepository.userQueryByUsername(username);
     const teamQuery = await this.teamRepository.teamInformation(teamId);
     const willBeDeleteTeamUser = await this.teamUserRepository.getATeamUser(
       userQuery,
       teamQuery,
     );
-    if (willBeDeleteTeamUser.memberRole !== MemberRole.Admin) {
-      this.teamUserRepository.delete(willBeDeleteTeamUser);
-      return { effect: true };
+    if (!willBeDeleteTeamUser) {
+      throw new BadRequestException('Not Found');
     }
-    throw new BadRequestException('Invalid Request');
+    this.teamUserRepository.delete(willBeDeleteTeamUser);
+    return { effect: true };
   }
 }
