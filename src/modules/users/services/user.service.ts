@@ -25,6 +25,9 @@ export class UserService {
     const account = await this.userRepository.userQueryByUsername(
       loginDto.username,
     );
+    if (!account) {
+      throw new BadRequestException('Not Found Account');
+    }
     if (
       account &&
       account.password === loginDto.password &&

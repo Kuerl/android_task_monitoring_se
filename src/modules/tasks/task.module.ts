@@ -7,6 +7,7 @@ import {
   PersonalTaskRepository,
   TeamTaskRepository,
 } from './repositories/task.repositories';
+import { TaskService } from './services/task.service';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import {
     ]),
   ],
   controllers: [TaskController],
-  providers: [],
+  providers: [TaskService],
 })
 export class TaskModule {}

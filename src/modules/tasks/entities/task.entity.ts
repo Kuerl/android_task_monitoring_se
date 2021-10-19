@@ -70,4 +70,7 @@ export class PersonalTaskEntity extends TaskEntity {
 export class TeamTaskEntity extends TaskEntity {
   @ManyToOne(() => TeamEntity, (team) => team.task)
   team: TaskEntity;
+
+  @ManyToOne(() => UserEntity, (user) => user.teamtask)
+  user: UserEntity;
 }

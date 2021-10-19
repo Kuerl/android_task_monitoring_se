@@ -1,31 +1,49 @@
-import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
+import { BaseTaskCreateDto } from '../common/dtos/task.dto';
+import { TaskService } from '../services/task.service';
 
 @Controller('task')
 export class TaskController {
+  constructor(private readonly taskService: TaskService) {}
+
   // PERSONAL TASK
-  @Post('personal')
-  createAPersonalTask() {
-    return;
+  @Post('personal/:username')
+  createAPersonalTask(
+    @Param('username') username: string,
+    @Body() baseTaskCreateDto: BaseTaskCreateDto,
+  ) {
+    return this.taskService.createAPersonalTask(username, baseTaskCreateDto);
   }
 
   @Get('personal/:username')
-  getAllPersonalTask() {
-    return;
+  getAllPersonalTask(@Param('username') username: string) {
+    return this.taskService.getAllPersonalTask(username);
   }
 
-  @Get('personal/:personalTaskId')
-  getDetailAPersonalTask() {
-    return;
+  @Get('personal/select/:personalTaskId')
+  getAPersonalTask(@Param('personalTaskId') taskId: number) {
+    return this.taskService.getAPersonalTask(taskId);
   }
 
-  @Put('personal/:personalTaskId')
-  editAPersonalTask() {
-    return;
+  @Put('personal/select/:personalTaskId')
+  editAPersonalTask(
+    @Param('personalTaskId') taskId: number,
+    @Body() baseTaskCreateDto: BaseTaskCreateDto,
+  ) {
+    return this.taskService.editAPersonalTask(taskId, baseTaskCreateDto);
   }
 
-  @Delete()
-  deleteAPersonalTask() {
-    return;
+  @Delete('personal/select/:personalTaskId')
+  deleteAPersonalTask(@Param('personalTaskId') taskId: number) {
+    return this.taskService.deleteAPersonalTask(taskId);
   }
 
   // TEAM TASK

@@ -11,10 +11,7 @@ export class UserRepository extends Repository<UserEntity> {
         username: username,
       },
     });
-    if (userQuery) {
-      return userQuery;
-    }
-    throw new BadRequestException('Not Found');
+    return userQuery;
   }
 
   async existedUser(username: string): Promise<ResponseUserData> {
