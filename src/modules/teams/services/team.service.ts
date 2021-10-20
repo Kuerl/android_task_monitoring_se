@@ -60,7 +60,7 @@ export class TeamService {
     // Create team user owner
     await this.teamUserRepository.createOwnerOfATeam(userQuery, createdTeam);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return this.teamRepository.createATeam(teamDto);
+    return createdTeam;
   }
 
   async addMember(teamMember: TeamMember, teamId: string): Promise<any> {

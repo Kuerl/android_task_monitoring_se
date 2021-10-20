@@ -8,6 +8,8 @@ import {
   TeamTaskRepository,
 } from './repositories/task.repositories';
 import { TaskService } from './services/task.service';
+import { TeamRepository } from '../teams/repositories/team.repositories';
+import { TeamUserRepository } from '../teams/repositories/team-user.repository';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { TaskService } from './services/task.service';
       PersonalTaskRepository,
       TeamTaskRepository,
       UserRepository,
+      TeamRepository,
+      TeamUserRepository,
     ]),
   ],
   controllers: [TaskController],

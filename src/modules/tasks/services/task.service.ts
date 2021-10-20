@@ -2,7 +2,11 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { BaseTaskCreateDto } from '../common/dtos/task.dto';
 import { UserRepository } from '../../users/repositories/user.repository';
 import { plainToClass } from 'class-transformer';
-import { PersonalTaskEntity, TaskEntity } from '../entities/task.entity';
+import {
+  PersonalTaskEntity,
+  TaskEntity,
+  TeamTaskEntity,
+} from '../entities/task.entity';
 import {
   PersonalTaskRepository,
   TeamTaskRepository,
@@ -10,6 +14,9 @@ import {
 import { TaskEntityType } from '../common/enum/taskentitytype.enum';
 import { TaskResponseDto } from '../common/dtos/task-response.dto';
 import { DeleteResult } from 'typeorm';
+import { TeamRepository } from '../../teams/repositories/team.repositories';
+import { TeamUserRepository } from '../../teams/repositories/team-user.repository';
+import { MemberRole } from '../../teams/common/enum/teamrole.enum';
 
 @Injectable()
 export class TaskService {
@@ -17,6 +24,8 @@ export class TaskService {
     private readonly userRepository: UserRepository,
     private readonly personalTaskRepository: PersonalTaskRepository,
     private readonly teamTaskRepository: TeamTaskRepository,
+    private readonly teamRepository: TeamRepository,
+    private readonly teamUserRepository: TeamUserRepository,
   ) {}
 
   // PERSONAL
@@ -28,6 +37,9 @@ export class TaskService {
       throw new BadRequestException('Invalid Route');
     }
     const userQuery = await this.userRepository.userQueryByUsername(username);
+    if (!userQuery) {
+      throw new BadRequestException('Not Found User');
+    }
     const personalTaskPlain = plainToClass(
       PersonalTaskEntity,
       baseTaskCreateDto,
@@ -84,4 +96,104 @@ export class TaskService {
   }
 
   // TEAM
+  async createATeamTask(
+    teamId: string,
+    baseTaskCreateDto: BaseTaskCreateDto,
+  ): Promise<TeamTaskEntity> {
+    const teamQuery = await this.teamRepository.findOne({
+      where: { pkTeam_Id: teamId },
+    });
+    if (!teamQuery) {
+      throw new BadRequestException('Not Found Team');
+    }
+    const teamTaskPlain = plainToClass(TeamTaskEntity, baseTaskCreateDto);
+    teamTaskPlain.team = teamQuery;
+    return this.teamTaskRepository.save(teamTaskPlain);
+  }
+
+  async getAllTeamTasksByTeamId(teamId: string): Promise<TeamTaskEntity[]> {
+    const teamQuery = await this.teamRepository.findOne({
+      where: { pkTeam_Id: teamId },
+    });
+    if (!teamQuery) {
+      throw new BadRequestException('Not Found Team');
+    }
+    return this.teamTaskRepository.find({
+      where: {
+        team: teamQuery,
+      },
+    });
+  }
+
+  async getATeamTask(teamTaskId: string): Promise<TeamTaskEntity> {
+    const teamTask = await this.teamTaskRepository.findOne({
+      where: {
+        pkTask_Id: teamTaskId,
+      },
+    });
+    if (!teamTask) {
+      throw new BadRequestException('Not Found Team Task');
+    }
+    return teamTask;
+  }
+
+  async editATeamTask(
+    teamTaskId: string,
+    username: string,
+    baseTaskCreateDto: BaseTaskCreateDto,
+  ): Promise<TeamTaskEntity> {
+    const teamTask = await this.teamTaskRepository.findOne({
+      where: {
+        pkTask_Id: teamTaskId,
+      },
+    });
+    if (!teamTask) {
+      throw new BadRequestException('Not Found Team Task');
+    }
+    const userQuery = await this.userRepository.userQueryByUsername(username);
+    if (!userQuery) {
+      throw new BadRequestException('Not Found User');
+    }
+    const userTeam = await this.teamUserRepository.findOne({
+      where: {
+        user: userQuery,
+        team: teamTask.team,
+      },
+    });
+    if (!userTeam) {
+      throw new BadRequestException('Not Allow');
+    }
+    return this.teamTaskRepository.save({
+      ...teamTask,
+      ...baseTaskCreateDto,
+    });
+  }
+
+  async deleteATeamTask(
+    teamTaskId: string,
+    username: string,
+  ): Promise<DeleteResult> {
+    const teamTask = await this.teamTaskRepository.findOne({
+      where: {
+        pkTask_Id: teamTaskId,
+      },
+    });
+    if (!teamTask) {
+      throw new BadRequestException('Not Found Team Task');
+    }
+    const userQuery = await this.userRepository.userQueryByUsername(username);
+    if (!userQuery) {
+      throw new BadRequestException('Not Found User');
+    }
+    const userTeam = await this.teamUserRepository.findOne({
+      where: {
+        user: userQuery,
+        team: teamTask.team,
+      },
+    });
+    if (!userTeam || userTeam.memberRole !== MemberRole.Admin) {
+      throw new BadRequestException('Not Allow');
+    }
+    return this.teamTaskRepository.delete(teamTask);
+  }
 }
