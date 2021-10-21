@@ -6,9 +6,6 @@ export class TeamDto implements TeamNameDto {
   @IsString()
   @Length(5, 20, { message: 'Invalid Username' })
   username: string; // For the admin
-
-  @IsString()
-  memberRole: MemberRole;
 }
 
 export class TeamNameDto {
@@ -20,4 +17,7 @@ export class TeamNameDto {
 export class TeamMemberRole {
   @IsString()
   memberRole: MemberRole;
+  @IsString()
+  @Length(5, 20, { message: 'Invalid Username' })
+  username: string; // For the admin
 }

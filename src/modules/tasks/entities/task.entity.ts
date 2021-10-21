@@ -8,8 +8,8 @@ import {
 } from 'typeorm';
 import { TaskEntityType } from '../common/enum/taskentitytype.enum';
 import { TaskType } from '../common/enum/tasktype.enum';
-import { TeamEntity } from './team.entity';
 import { UserEntity } from '../../users/entities/user.entity';
+import { TeamEntity } from '../../teams/entities/team.entity';
 
 @Entity('Task')
 @TableInheritance({
@@ -69,5 +69,5 @@ export class PersonalTaskEntity extends TaskEntity {
 @ChildEntity(TaskEntityType.Team)
 export class TeamTaskEntity extends TaskEntity {
   @ManyToOne(() => TeamEntity, (team) => team.task)
-  team: TaskEntity;
+  team: TeamEntity;
 }

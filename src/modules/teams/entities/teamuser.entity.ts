@@ -3,10 +3,12 @@ import { MemberRole } from '../common/enum/teamrole.enum';
 import { TeamEntity } from './team.entity';
 import { UserEntity } from '../../users/entities/user.entity';
 
-@Entity('Team_User')
+@Entity('TeamUser')
 export class TeamUserEntity {
-  @PrimaryGeneratedColumn()
-  team_user_Id: number;
+  @PrimaryGeneratedColumn({
+    name: 'teamUserId',
+  })
+  teamUserId: number;
 
   @Column({
     name: 'MemberRole',

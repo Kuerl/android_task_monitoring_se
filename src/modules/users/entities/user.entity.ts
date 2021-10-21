@@ -1,6 +1,6 @@
 import { MessageEntity } from 'src/modules/messages/entities/message.entity';
 import { PersonalTaskEntity } from 'src/modules/tasks/entities/task.entity';
-import { TeamUserEntity } from 'src/modules/tasks/entities/teamuser.entity';
+import { TeamUserEntity } from 'src/modules/teams/entities/teamuser.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('User')

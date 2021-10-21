@@ -1,29 +1,28 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TeamRepository } from './repositories/teams.repositories';
 import { TaskController } from './controllers/task.controller';
-import { TeamController } from './controllers/team.controller';
-import { TeamService } from './services/team.service';
 import { UserRepository } from '../users/repositories/user.repository';
-import { TeamUserRepository } from './repositories/teamuser.repository';
 import {
   TaskRepository,
   PersonalTaskRepository,
   TeamTaskRepository,
 } from './repositories/task.repositories';
+import { TaskService } from './services/task.service';
+import { TeamRepository } from '../teams/repositories/team.repositories';
+import { TeamUserRepository } from '../teams/repositories/team-user.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      TeamRepository,
       TaskRepository,
       PersonalTaskRepository,
       TeamTaskRepository,
       UserRepository,
+      TeamRepository,
       TeamUserRepository,
     ]),
   ],
-  controllers: [TaskController, TeamController],
-  providers: [TeamService],
+  controllers: [TaskController],
+  providers: [TaskService],
 })
 export class TaskModule {}
