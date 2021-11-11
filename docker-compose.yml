@@ -1,0 +1,48 @@
+version: '3.7'
+
+services:
+  backend:
+    container_name: se_service
+    restart: always
+    build: .
+    environment:
+      - APP_ENV=development
+      - APP_PORT=7000
+    volumes:
+      - .:/var/www/iutour/
+      - ./src:/var/www/iutour/src
+      # - ./test:/var/www/myapp/test
+    working_dir: /var/www/iutour
+    ports:
+      - '3000:3000'
+    links:
+      - mysql
+      - redis
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - se_atm
+    command: yarn start
+
+  mysql: # Example Service
+    container_name: se_mysql
+    restart: always
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=kuerl
+      - MYSQL_PASSWORD=test
+      - MYSQL_DATABASE=se_atm_service
+    ports:
+      - '3306:3306'
+    volumes:
+      - myapp_mysql_data:/var/lib/mysql
+    networks:
+      - se_atm
+
+volumes:
+  myapp_mysql_data:
+
+networks:
+  se_atm:
