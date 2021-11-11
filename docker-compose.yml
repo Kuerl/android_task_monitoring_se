@@ -14,13 +14,11 @@ services:
       # - ./test:/var/www/myapp/test
     working_dir: /var/www/iutour
     ports:
-      - '3000:3000'
+      - '7000:7000'
     links:
       - mysql
-      - redis
     depends_on:
       - mysql
-      - redis
     networks:
       - se_atm
     command: yarn start
@@ -35,7 +33,7 @@ services:
       - MYSQL_PASSWORD=test
       - MYSQL_DATABASE=se_atm_service
     ports:
-      - '3306:3306'
+      - '33060:33060'
     volumes:
       - myapp_mysql_data:/var/lib/mysql
     networks:
