@@ -9,12 +9,12 @@ services:
       - APP_ENV=development
       - APP_PORT=7000
     volumes:
-      - .:/var/www/iutour/
-      - ./src:/var/www/iutour/src
+      - .:/var/www/se_atm/
+      - ./src:/var/www/se_atm/src
       # - ./test:/var/www/myapp/test
-    working_dir: /var/www/iutour
+    working_dir: /var/www/se_atm
     ports:
-      - '7000:7000'
+      - '3000:3000'
     links:
       - mysql
     depends_on:
@@ -29,9 +29,9 @@ services:
     image: mysql:5.7
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_USER=kuerl
-      - MYSQL_PASSWORD=test
-      - MYSQL_DATABASE=se_atm_service
+      # - MYSQL_USER=kuerl
+      # - MYSQL_PASSWORD=kuerl
+      - MYSQL_DATABASE=sebackend
     ports:
       - '3306:3306'
     volumes:

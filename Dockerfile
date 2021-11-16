@@ -1,6 +1,6 @@
 FROM node:14.17.5-alpine
 
-WORKDIR /var/www/iutour
+WORKDIR /var/www/se_atm
 
 COPY package.json yarn.lock ./ 
 
