@@ -29,8 +29,8 @@ services:
     image: mysql:5.7
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      # - MYSQL_USER=kuerl
-      # - MYSQL_PASSWORD=kuerl
+      - MYSQL_USER=kuerl
+      - MYSQL_PASSWORD=kuerl
       - MYSQL_DATABASE=sebackend
     ports:
       - '3306:3306'
