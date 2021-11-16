@@ -30,7 +30,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=kuerl
-      - MYSQL_PASSWORD=kuerl
+      - MYSQL_PASSWORD=test
       - MYSQL_DATABASE=sebackend
     ports:
       - '3306:3306'
