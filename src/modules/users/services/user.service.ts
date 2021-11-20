@@ -28,21 +28,21 @@ export class UserService {
   }
 
   // All functions is not contain the authentication guard
-  async login(loginDto: LoginDto): Promise<{ access: boolean }> {
+  async login(loginDto: LoginDto): Promise<any> {
     const account = await this.userRepository.userQueryByUsername(
       loginDto.username,
     );
     if (!account) {
-      throw new BadRequestException('Not Found Account');
+      return { effect: false, status: 'Invalid username' };
     }
     if (
       account &&
       account.password === loginDto.password &&
       account.active === true
     ) {
-      return { access: true };
+      return { effect: true, access: true };
     }
-    return { access: false };
+    return { effect: false, access: false, status: 'Invalid password' };
   }
 
   async getUserInformation(username: string): Promise<any> {
