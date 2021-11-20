@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  // UsePipes,
+  // ValidationPipe,
+} from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { plainToClass } from 'class-transformer';
 import { UserEntity } from '../entities/user.entity';
@@ -6,22 +11,24 @@ import { LoginDto, RegisterUserDto, UpdateUserDto } from '../common/dtos';
 import { ResponseUserData } from '../common/dtos/res-user-data.dto';
 
 @Injectable()
+// @UsePipes(new ValidationPipe())
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async register(registerUserDto: RegisterUserDto): Promise<UserEntity> {
+  async register(registerUserDto: RegisterUserDto): Promise<any> {
     const existedInformation = await this.userRepository.userQueryByUsername(
       registerUserDto.username,
     );
     if (existedInformation) {
-      throw new BadRequestException('Existed Account Information');
+      return { effect: false, status: 'Account existed' };
     }
     const plainUserData = plainToClass(UserEntity, registerUserDto);
-    return this.userRepository.save(plainUserData);
+    this.userRepository.save(plainUserData);
+    return { effect: true, status: 'Create new account successfully' };
   }
 
   // All functions is not contain the authentication guard
-  async login(loginDto: LoginDto): Promise<{ login: boolean }> {
+  async login(loginDto: LoginDto): Promise<{ access: boolean }> {
     const account = await this.userRepository.userQueryByUsername(
       loginDto.username,
     );
@@ -33,13 +40,16 @@ export class UserService {
       account.password === loginDto.password &&
       account.active === true
     ) {
-      return { login: true };
+      return { access: true };
     }
-    return { login: false };
+    return { access: false };
   }
 
-  async getUserInformation(username: string): Promise<ResponseUserData> {
+  async getUserInformation(username: string): Promise<any> {
     const account = await this.userRepository.existedUser(username);
+    if (!account) {
+      return { status: 'Not found information' };
+    }
     return account;
   }
 
@@ -59,13 +69,13 @@ export class UserService {
     return updatedAccount;
   }
 
-  async deleteAccount(username: string): Promise<UserEntity> {
+  async deleteAccount(username: string): Promise<any> {
     const account = await this.userRepository.userQueryByUsername(username);
     if (account.active === true) {
       account.active = false;
       return this.userRepository.save(account);
     }
-    throw new BadRequestException('Invalid Request');
+    return { effect: false, status: 'Account disable' };
   }
 
   async reactiveAccount(username: string): Promise<UserEntity> {

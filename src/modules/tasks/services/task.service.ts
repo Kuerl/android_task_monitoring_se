@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseTaskCreateDto } from '../common/dtos/task.dto';
 import { UserRepository } from '../../users/repositories/user.repository';
 import { plainToClass } from 'class-transformer';
@@ -12,7 +12,6 @@ import {
   TeamTaskRepository,
 } from '../repositories/task.repositories';
 import { TaskEntityType } from '../common/enum/taskentitytype.enum';
-import { TaskResponseDto } from '../common/dtos/task-response.dto';
 import { DeleteResult } from 'typeorm';
 import { TeamRepository } from '../../teams/repositories/team.repositories';
 import { TeamUserRepository } from '../../teams/repositories/team-user.repository';
@@ -32,13 +31,16 @@ export class TaskService {
   async createAPersonalTask(
     username: string,
     baseTaskCreateDto: BaseTaskCreateDto,
-  ): Promise<TaskResponseDto> {
+  ): Promise<any> {
     if (baseTaskCreateDto.taskType !== TaskEntityType.Personal) {
-      throw new BadRequestException('Invalid Route');
+      return {
+        effect: false,
+        status: 'This route is just accept personal task',
+      };
     }
     const userQuery = await this.userRepository.userQueryByUsername(username);
     if (!userQuery) {
-      throw new BadRequestException('Not Found User');
+      return { effect: false, status: 'Invalid username' };
     }
     const personalTaskPlain = plainToClass(
       PersonalTaskEntity,
@@ -47,9 +49,9 @@ export class TaskService {
     const personalTaskCreate =
       this.personalTaskRepository.create(personalTaskPlain);
     personalTaskCreate.user = userQuery;
-    this.personalTaskRepository.save(personalTaskCreate);
+    const saved = await this.personalTaskRepository.save(personalTaskCreate);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { user, ...res } = personalTaskCreate;
+    const { user, ...res } = saved;
     return res;
   }
 
@@ -99,24 +101,24 @@ export class TaskService {
   async createATeamTask(
     teamId: string,
     baseTaskCreateDto: BaseTaskCreateDto,
-  ): Promise<TeamTaskEntity> {
+  ): Promise<any> {
     const teamQuery = await this.teamRepository.findOne({
       where: { pkTeam_Id: teamId },
     });
     if (!teamQuery) {
-      throw new BadRequestException('Not Found Team');
+      return { effect: false, status: 'Not found team' };
     }
     const teamTaskPlain = plainToClass(TeamTaskEntity, baseTaskCreateDto);
     teamTaskPlain.team = teamQuery;
     return this.teamTaskRepository.save(teamTaskPlain);
   }
 
-  async getAllTeamTasksByTeamId(teamId: string): Promise<TeamTaskEntity[]> {
+  async getAllTeamTasksByTeamId(teamId: string): Promise<any> {
     const teamQuery = await this.teamRepository.findOne({
       where: { pkTeam_Id: teamId },
     });
     if (!teamQuery) {
-      throw new BadRequestException('Not Found Team');
+      return { effect: false, status: 'Not found team' };
     }
     return this.teamTaskRepository.find({
       where: {
@@ -125,14 +127,14 @@ export class TaskService {
     });
   }
 
-  async getATeamTask(teamTaskId: string): Promise<TeamTaskEntity> {
+  async getATeamTask(teamTaskId: string): Promise<any> {
     const teamTask = await this.teamTaskRepository.findOne({
       where: {
         pkTask_Id: teamTaskId,
       },
     });
     if (!teamTask) {
-      throw new BadRequestException('Not Found Team Task');
+      return { effect: false, status: "Not found team's task" };
     }
     return teamTask;
   }
@@ -141,18 +143,18 @@ export class TaskService {
     teamTaskId: string,
     username: string,
     baseTaskCreateDto: BaseTaskCreateDto,
-  ): Promise<TeamTaskEntity> {
+  ): Promise<any> {
     const teamTask = await this.teamTaskRepository.findOne({
       where: {
         pkTask_Id: teamTaskId,
       },
     });
     if (!teamTask) {
-      throw new BadRequestException('Not Found Team Task');
+      return { effect: false, status: "Not found team's task" };
     }
     const userQuery = await this.userRepository.userQueryByUsername(username);
     if (!userQuery) {
-      throw new BadRequestException('Not Found User');
+      return { effect: false, status: 'Invalid username' };
     }
     const userTeam = await this.teamUserRepository.findOne({
       where: {
@@ -161,7 +163,7 @@ export class TaskService {
       },
     });
     if (!userTeam) {
-      throw new BadRequestException('Not Allow');
+      return { effect: false, status: 'Not allow' };
     }
     return this.teamTaskRepository.save({
       ...teamTask,
@@ -169,21 +171,18 @@ export class TaskService {
     });
   }
 
-  async deleteATeamTask(
-    teamTaskId: string,
-    username: string,
-  ): Promise<DeleteResult> {
+  async deleteATeamTask(teamTaskId: string, username: string): Promise<any> {
     const teamTask = await this.teamTaskRepository.findOne({
       where: {
         pkTask_Id: teamTaskId,
       },
     });
     if (!teamTask) {
-      throw new BadRequestException('Not Found Team Task');
+      return { effect: false, status: "Not found team's task" };
     }
     const userQuery = await this.userRepository.userQueryByUsername(username);
     if (!userQuery) {
-      throw new BadRequestException('Not Found User');
+      return { effect: false, status: 'Invalid username' };
     }
     const userTeam = await this.teamUserRepository.findOne({
       where: {
@@ -192,7 +191,7 @@ export class TaskService {
       },
     });
     if (!userTeam || userTeam.memberRole !== MemberRole.Admin) {
-      throw new BadRequestException('Not Allow');
+      return { effect: false, status: 'Not allow' };
     }
     return this.teamTaskRepository.delete(teamTask);
   }

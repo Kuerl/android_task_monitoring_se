@@ -1,6 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
-import { ResponseUserData } from '../common/dtos/res-user-data.dto';
 import { UserEntity } from '../entities/user.entity';
 
 @EntityRepository(UserEntity)
@@ -14,10 +12,10 @@ export class UserRepository extends Repository<UserEntity> {
     return userQuery;
   }
 
-  async existedUser(username: string): Promise<ResponseUserData> {
+  async existedUser(username: string): Promise<any> {
     const userQuery = await this.userQueryByUsername(username);
     if (!userQuery) {
-      throw new BadRequestException('Not Found');
+      return userQuery;
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...res } = userQuery;

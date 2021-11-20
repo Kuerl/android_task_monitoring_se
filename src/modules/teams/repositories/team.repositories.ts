@@ -21,9 +21,6 @@ export class TeamRepository extends Repository<TeamEntity> {
         pkTeam_Id: teamId,
       },
     });
-    if (teamQuery) {
-      return teamQuery;
-    }
-    throw new BadRequestException('Not Found');
+    return teamQuery;
   }
 }

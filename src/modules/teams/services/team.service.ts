@@ -5,10 +5,7 @@ import { MemberRole } from '../common/enum/teamrole.enum';
 import { UserRepository } from '../../users/repositories/user.repository';
 import { TeamMember } from '../common/dtos/teammember.dto';
 import { TeamUserRepository } from '../repositories/team-user.repository';
-import { TeamUserEntity } from '../entities/teamuser.entity';
 import { TeamEntity } from '../entities/team.entity';
-import { ResponseTeamInformation } from '../common/dtos/res-team-information.dto';
-import { ResponseEffect } from '../common/dtos/res-effect.dto';
 
 @Injectable()
 export class TeamService {
@@ -23,12 +20,18 @@ export class TeamService {
   // By username, return all teams that this member exist.
   async getTeamsByUsername(username: string): Promise<any> {
     const userQuery = await this.userRepository.userQueryByUsername(username);
+    if (!userQuery) {
+      return { effect: false, status: 'Invalid username' };
+    }
     return this.teamUserRepository.allTeamByUserRelation(userQuery);
   }
 
   // By team_Id, return all information about team and member of this team.
-  async getTeamInformation(team_Id: string): Promise<ResponseTeamInformation> {
+  async getTeamInformation(team_Id: string): Promise<any> {
     const teamQuery = await this.teamRepository.teamInformation(team_Id);
+    if (!teamQuery) {
+      return { effect: false, status: 'Invalid team_Id' };
+    }
     const teamUserQuery = await this.teamUserRepository.allUserOfATeam(
       teamQuery,
     );
@@ -55,6 +58,9 @@ export class TeamService {
     const userQuery = await this.userRepository.userQueryByUsername(
       teamDto.username,
     );
+    if (!userQuery) {
+      return { effect: false };
+    }
     // Create team
     const createdTeam = await this.teamRepository.createATeam(teamDto);
     // Create team user owner
@@ -69,6 +75,9 @@ export class TeamService {
     const memberExisted = [];
 
     const teamQuery = await this.teamRepository.teamInformation(teamId);
+    if (!teamQuery) {
+      return { effect: false, status: 'Invalid team_Id' };
+    }
     for (let i = 0; i < teamMember.username.length; i++) {
       const element = teamMember.username[i];
       const userQuery = await this.userRepository.findOne({
@@ -112,7 +121,7 @@ export class TeamService {
     teamMemberRole: TeamMemberRole,
     teamId: string,
     username: string,
-  ): Promise<TeamUserEntity> {
+  ): Promise<any> {
     if (teamMemberRole.memberRole === MemberRole.Admin) {
       throw new BadRequestException('Invalid Member Role');
     }
@@ -121,6 +130,12 @@ export class TeamService {
     const userQuery = await this.userRepository.userQueryByUsername(
       teamMemberRole.username,
     );
+    if (!ownerQuery) {
+      return { status: 'Invalid owner' };
+    }
+    if (!userQuery) {
+      return { status: 'Invalid member' };
+    }
     const willBeUpdatedTeamUser = await this.teamUserRepository.getATeamUser(
       userQuery,
       teamQuery,
@@ -130,25 +145,28 @@ export class TeamService {
       teamQuery,
     );
     if (!willBeUpdatedTeamUser || !owenerCheck) {
-      throw new BadRequestException('Not Found');
+      return { status: 'Invalid request' };
     }
     if (owenerCheck.memberRole === MemberRole.Admin) {
       willBeUpdatedTeamUser.memberRole = teamMemberRole.memberRole;
       return this.teamUserRepository.save(willBeUpdatedTeamUser);
     }
-    throw new BadRequestException('No effect member role');
+    return { status: 'No effect member role' };
   }
 
   async deleteMember(
     teamId: string,
     username: string,
     delusername: string,
-  ): Promise<ResponseEffect> {
+  ): Promise<any> {
     const userQuery = await this.userRepository.userQueryByUsername(username);
     const teamQuery = await this.teamRepository.teamInformation(teamId);
     const delusernameQuery = await this.userRepository.userQueryByUsername(
       delusername,
     );
+    if (!userQuery || !delusername) {
+      return { status: 'Invalid user' };
+    }
     const willBeDeleteOwnerTeamUser =
       await this.teamUserRepository.getATeamUser(userQuery, teamQuery);
     if (!willBeDeleteOwnerTeamUser) {

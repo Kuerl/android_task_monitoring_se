@@ -4,7 +4,7 @@ import { IsString, Length } from 'class-validator';
 export class TeamDto implements TeamNameDto {
   teamName: string;
   @IsString()
-  @Length(5, 20, { message: 'Invalid Username' })
+  @Length(6, 30, { message: 'Invalid Username' })
   username: string; // For the admin
 }
 

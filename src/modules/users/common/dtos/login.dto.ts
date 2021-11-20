@@ -2,7 +2,7 @@ import { IsString, Length } from 'class-validator';
 
 export class LoginDto {
   @IsString()
-  @Length(4, 10, { message: 'Invalid Username Length' })
+  @Length(6, 30, { message: 'Invalid Username Length' })
   username: string;
 
   @IsString()
