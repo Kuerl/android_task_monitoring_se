@@ -64,4 +64,7 @@ export class UserEntity {
 
   @OneToMany(() => PersonalTaskEntity, (personaltask) => personaltask.user)
   personaltask: PersonalTaskEntity[];
+
+  @OneToMany(() => PersonalTaskEntity, (teamtask) => teamtask.user)
+  teamtask: PersonalTaskEntity[];
 }
