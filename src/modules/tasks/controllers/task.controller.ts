@@ -31,19 +31,27 @@ export class TaskController {
   @Get('personal/select/:personalTaskId')
   getAPersonalTask(@Param('personalTaskId') taskId: number) {
     return this.taskService.getAPersonalTask(taskId);
-  }
+  } // unnecessary
 
-  @Put('personal/select/:personalTaskId')
+  @Put('personal/:username/:personalTaskId')
   editAPersonalTask(
     @Param('personalTaskId') taskId: number,
     @Body() baseTaskCreateDto: BaseTaskCreateDto,
+    @Param('username') username: string,
   ) {
-    return this.taskService.editAPersonalTask(taskId, baseTaskCreateDto);
+    return this.taskService.editAPersonalTask(
+      taskId,
+      baseTaskCreateDto,
+      username,
+    );
   }
 
-  @Delete('personal/select/:personalTaskId')
-  deleteAPersonalTask(@Param('personalTaskId') taskId: number) {
-    return this.taskService.deleteAPersonalTask(taskId);
+  @Delete('personal/:username/:personalTaskId')
+  deleteAPersonalTask(
+    @Param('personalTaskId') taskId: number,
+    @Param('username') username: string,
+  ) {
+    return this.taskService.deleteAPersonalTask(taskId, username);
   }
 
   // TEAM TASK

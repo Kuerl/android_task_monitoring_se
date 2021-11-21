@@ -1,4 +1,3 @@
-import { IsDate } from 'class-validator';
 import { TaskEntityType } from '../enum/taskentitytype.enum';
 import { TaskType } from '../enum/tasktype.enum';
 

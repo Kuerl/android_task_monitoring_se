@@ -12,7 +12,6 @@ import {
   TeamTaskRepository,
 } from '../repositories/task.repositories';
 import { TaskEntityType } from '../common/enum/taskentitytype.enum';
-import { DeleteResult } from 'typeorm';
 import { TeamRepository } from '../../teams/repositories/team.repositories';
 import { TeamUserRepository } from '../../teams/repositories/team-user.repository';
 import { MemberRole } from '../../teams/common/enum/teamrole.enum';
@@ -49,14 +48,16 @@ export class TaskService {
     const personalTaskCreate =
       this.personalTaskRepository.create(personalTaskPlain);
     personalTaskCreate.user = userQuery;
-    const saved = await this.personalTaskRepository.save(personalTaskCreate);
+    await this.personalTaskRepository.save(personalTaskCreate);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { user, ...res } = saved;
-    return res;
+    return { effect: true, status: 'Create successfully' };
   }
 
-  async getAllPersonalTask(username: string): Promise<TaskEntity[]> {
+  async getAllPersonalTask(username: string): Promise<any> {
     const userQuery = await this.userRepository.userQueryByUsername(username);
+    if (!userQuery) {
+      return { effect: false, status: 'Invalid username' };
+    }
     const tasksQuery = await this.personalTaskRepository.getAllPersonalTask(
       userQuery,
     );
@@ -75,26 +76,45 @@ export class TaskService {
   async editAPersonalTask(
     taskId: number,
     baseTaskCreateDto: BaseTaskCreateDto,
+    username: string,
   ) {
+    const userQuery = await this.userRepository.userQueryByUsername(username);
+    if (!userQuery) {
+      return { effect: false, status: 'Invalid username' };
+    }
     const taskQuery = await this.personalTaskRepository.findOne({
       where: {
         pkTask_Id: taskId,
       },
     });
+    if (!taskQuery) {
+      return { effect: false, status: 'Invalid taskId' };
+    }
+    if (!(await this.personalTaskRepository.checkOwner(username, taskId))) {
+      return { effect: false, status: 'Not allow' };
+    }
     const updateTask = plainToClass(PersonalTaskEntity, baseTaskCreateDto);
-    return this.personalTaskRepository.save({
+    this.personalTaskRepository.save({
       ...taskQuery,
       ...updateTask,
     });
+    return { effect: true, status: 'Update successfully' };
   }
 
-  async deleteAPersonalTask(taskId: number): Promise<DeleteResult> {
+  async deleteAPersonalTask(taskId: number, username: string): Promise<any> {
     const taskQueryDel = await this.personalTaskRepository.findOne({
       where: {
         pkTask_Id: taskId,
       },
     });
-    return this.personalTaskRepository.delete(taskQueryDel);
+    if (!taskQueryDel) {
+      return { effect: false, status: 'Invalid taskId' };
+    }
+    if (!(await this.personalTaskRepository.checkOwner(username, taskId))) {
+      return { effect: false, status: 'Not allow' };
+    }
+    this.personalTaskRepository.delete(taskQueryDel);
+    return { effect: true, status: 'Delete successfully' };
   }
 
   // TEAM

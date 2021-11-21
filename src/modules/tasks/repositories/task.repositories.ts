@@ -23,6 +23,16 @@ export class PersonalTaskRepository extends Repository<PersonalTaskEntity> {
       },
     });
   }
+
+  async checkOwner(username: string, pkTask_Id: number): Promise<boolean> {
+    const taskQuery = await this.findOne({
+      where: {
+        pkTask_Id: pkTask_Id,
+      },
+      relations: ['user'],
+    });
+    return taskQuery.user.username === username;
+  }
 }
 
 @Injectable()
