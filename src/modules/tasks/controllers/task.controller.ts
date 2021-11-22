@@ -63,34 +63,37 @@ export class TaskController {
     return this.taskService.createATeamTask(teamId, baseTaskCreateDto);
   }
 
-  @Get('team/id/:teamTaskId')
-  getATeamTask(@Param('teamTaskId') teamTaskId: string) {
-    return this.taskService.getATeamTask(teamTaskId);
-  }
+  // @Get('team/id/:teamTaskId')
+  // getATeamTask(@Param('teamTaskId') teamTaskId: string) {
+  //   return this.taskService.getATeamTask(teamTaskId);
+  // }
 
   @Get('team/:teamId')
   getAllTeamTasksByTeamId(@Param('teamId') teamId: string) {
     return this.taskService.getAllTeamTasksByTeamId(teamId);
   }
 
-  @Put('team/:teamTaskId/:username')
+  @Put('team/:teamId/:teamTaskId/:username')
   editATeamTask(
+    @Param('teamId') teamId: string,
     @Param('teamTaskId') teamTaskId: string,
     @Param('username') username: string,
     @Body() baseTaskCreateDto: BaseTaskCreateDto,
   ) {
     return this.taskService.editATeamTask(
+      teamId,
       teamTaskId,
       username,
       baseTaskCreateDto,
     );
   }
 
-  @Delete('team/:teamTaskId/:username')
+  @Delete('team/:teamId/:teamTaskId/:username')
   deleteATeamTask(
+    @Param('teamId') teamId: string,
     @Param('teamTaskId') teamTaskId: string,
     @Param('username') username: string,
   ) {
-    return this.taskService.deleteATeamTask(teamTaskId, username);
+    return this.taskService.deleteATeamTask(teamId, teamTaskId, username);
   }
 }

@@ -11,4 +11,6 @@ export class BaseTaskCreateDto {
   start: Date;
   // @IsDate()
   due: Date;
+
+  user: string;
 }

@@ -128,9 +128,17 @@ export class TaskService {
     if (!teamQuery) {
       return { effect: false, status: 'Not found team' };
     }
+    const userQuery = await this.userRepository.userQueryByUsername(
+      baseTaskCreateDto.user,
+    );
+    if (!userQuery) {
+      return { effect: false, status: 'Invalid username' };
+    }
     const teamTaskPlain = plainToClass(TeamTaskEntity, baseTaskCreateDto);
     teamTaskPlain.team = teamQuery;
-    return this.teamTaskRepository.save(teamTaskPlain);
+    teamTaskPlain.user = userQuery;
+    await this.teamTaskRepository.save(teamTaskPlain);
+    return { effect: true, status: 'Create team task successfully' };
   }
 
   async getAllTeamTasksByTeamId(teamId: string): Promise<any> {
@@ -147,19 +155,20 @@ export class TaskService {
     });
   }
 
-  async getATeamTask(teamTaskId: string): Promise<any> {
-    const teamTask = await this.teamTaskRepository.findOne({
-      where: {
-        pkTask_Id: teamTaskId,
-      },
-    });
-    if (!teamTask) {
-      return { effect: false, status: "Not found team's task" };
-    }
-    return teamTask;
-  }
+  // async getATeamTask(teamTaskId: string): Promise<any> {
+  //   const teamTask = await this.teamTaskRepository.findOne({
+  //     where: {
+  //       pkTask_Id: teamTaskId,
+  //     },
+  //   });
+  //   if (!teamTask) {
+  //     return { effect: false, status: "Not found team's task" };
+  //   }
+  //   return teamTask;
+  // }
 
   async editATeamTask(
+    teamId: string,
     teamTaskId: string,
     username: string,
     baseTaskCreateDto: BaseTaskCreateDto,
@@ -176,22 +185,42 @@ export class TaskService {
     if (!userQuery) {
       return { effect: false, status: 'Invalid username' };
     }
+    const teamQuery = await this.teamRepository.findOne({
+      where: { pkTeam_Id: teamId },
+    });
+    if (!teamQuery) {
+      return { effect: false, status: 'Not found team' };
+    }
     const userTeam = await this.teamUserRepository.findOne({
       where: {
         user: userQuery,
-        team: teamTask.team,
+        team: teamQuery,
       },
     });
     if (!userTeam) {
       return { effect: false, status: 'Not allow' };
     }
-    return this.teamTaskRepository.save({
+    const userQuery2 = await this.userRepository.userQueryByUsername(
+      baseTaskCreateDto.user,
+    );
+    if (!userQuery) {
+      return { effect: false, status: 'Invalid username' };
+    }
+    const teamTaskPlain = plainToClass(TeamTaskEntity, baseTaskCreateDto);
+    teamTaskPlain.team = teamQuery;
+    teamTaskPlain.user = userQuery2;
+    this.teamTaskRepository.save({
       ...teamTask,
-      ...baseTaskCreateDto,
+      ...teamTaskPlain,
     });
+    return { effect: true, status: 'Update task successfully' };
   }
 
-  async deleteATeamTask(teamTaskId: string, username: string): Promise<any> {
+  async deleteATeamTask(
+    teamId: string,
+    teamTaskId: string,
+    username: string,
+  ): Promise<any> {
     const teamTask = await this.teamTaskRepository.findOne({
       where: {
         pkTask_Id: teamTaskId,
@@ -200,6 +229,12 @@ export class TaskService {
     if (!teamTask) {
       return { effect: false, status: "Not found team's task" };
     }
+    const teamQuery = await this.teamRepository.findOne({
+      where: { pkTeam_Id: teamId },
+    });
+    if (!teamQuery) {
+      return { effect: false, status: 'Not found team' };
+    }
     const userQuery = await this.userRepository.userQueryByUsername(username);
     if (!userQuery) {
       return { effect: false, status: 'Invalid username' };
@@ -207,12 +242,12 @@ export class TaskService {
     const userTeam = await this.teamUserRepository.findOne({
       where: {
         user: userQuery,
-        team: teamTask.team,
+        team: teamQuery,
       },
     });
     if (!userTeam || userTeam.memberRole !== MemberRole.Admin) {
       return { effect: false, status: 'Not allow' };
     }
-    return this.teamTaskRepository.delete(teamTask);
+    return { effect: true, status: 'Delete task successfully' };
   }
 }

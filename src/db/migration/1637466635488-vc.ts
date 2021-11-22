@@ -1,7 +1,7 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class vsc1637233025402 implements MigrationInterface {
-    name = 'vsc1637233025402'
+export class vc1637466635488 implements MigrationInterface {
+    name = 'vc1637466635488'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`sebackend\`.\`TeamUser\` (\`teamUserId\` int NOT NULL AUTO_INCREMENT, \`MemberRole\` enum ('Admin', 'Moderator', 'Member') NOT NULL, \`teamPkTeamId\` varchar(255) NULL, \`userPkAccountId\` int NULL, PRIMARY KEY (\`teamUserId\`)) ENGINE=InnoDB`);
