@@ -48,9 +48,15 @@ export class TaskService {
     const personalTaskCreate =
       this.personalTaskRepository.create(personalTaskPlain);
     personalTaskCreate.user = userQuery;
-    await this.personalTaskRepository.save(personalTaskCreate);
+    const createdTask = await this.personalTaskRepository.save(
+      personalTaskCreate,
+    );
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return { effect: true, status: 'Create successfully' };
+    return {
+      effect: true,
+      status: 'Create successfully',
+      pkTask_Id: createdTask.pkTask_Id,
+    };
   }
 
   async getAllPersonalTask(username: string): Promise<any> {
@@ -137,8 +143,12 @@ export class TaskService {
     const teamTaskPlain = plainToClass(TeamTaskEntity, baseTaskCreateDto);
     teamTaskPlain.team = teamQuery;
     teamTaskPlain.user = userQuery;
-    await this.teamTaskRepository.save(teamTaskPlain);
-    return { effect: true, status: 'Create team task successfully' };
+    const createdTask = await this.teamTaskRepository.save(teamTaskPlain);
+    return {
+      effect: true,
+      status: 'Create team task successfully',
+      pkTask_Id: createdTask.pkTask_Id,
+    };
   }
 
   async getAllTeamTasksByTeamId(teamId: string): Promise<any> {
