@@ -158,24 +158,19 @@ export class TaskService {
     if (!teamQuery) {
       return { effect: false, status: 'Not found team' };
     }
-    return this.teamTaskRepository.find({
+    const tasksQuery = await this.teamTaskRepository.find({
       where: {
         team: teamQuery,
       },
+      relations: ['user'],
     });
+    for (let i = 0; i < tasksQuery.length; i++) {
+      const element = tasksQuery[i];
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      delete element.user.password;
+    }
+    return tasksQuery;
   }
-
-  // async getATeamTask(teamTaskId: string): Promise<any> {
-  //   const teamTask = await this.teamTaskRepository.findOne({
-  //     where: {
-  //       pkTask_Id: teamTaskId,
-  //     },
-  //   });
-  //   if (!teamTask) {
-  //     return { effect: false, status: "Not found team's task" };
-  //   }
-  //   return teamTask;
-  // }
 
   async editATeamTask(
     teamId: string,

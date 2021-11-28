@@ -6,6 +6,7 @@ import { MessageRepository } from './repositories/message.repository';
 import { TeamRepository } from '../teams/repositories/team.repositories';
 import { UserRepository } from '../users/repositories/user.repository';
 import { TeamUserRepository } from '../teams/repositories/team-user.repository';
+import { MessageGateway } from './gateways/message.gateway';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { TeamUserRepository } from '../teams/repositories/team-user.repository';
     ]),
   ],
   controllers: [MessageController],
-  providers: [MessageService],
+  providers: [MessageService, MessageGateway],
 })
 export class MessageModule {}
