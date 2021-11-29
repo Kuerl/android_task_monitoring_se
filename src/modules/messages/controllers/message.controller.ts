@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { MessageService } from '../services/message.service';
-import { EditMessageDto, MessageDto } from '../common/dtos/message.dto';
+import { MessageDto } from '../common/dtos/message.dto';
 
 @Controller('message')
 export class MessageController {
@@ -20,12 +20,12 @@ export class MessageController {
     return this.messageService.createAMessage(teamId, username, messageDto);
   }
 
-  @Put(':teamId/:username') // for flag
-  editAMessage(
-    @Param('teamId') teamId: string,
-    @Param('username') username: string,
-    @Body() messageDto: EditMessageDto,
-  ) {
-    return this.messageService.editAMessage(teamId, username, messageDto);
-  }
+  // @Put(':teamId/:username') // for flag
+  // editAMessage(
+  //   @Param('teamId') teamId: string,
+  //   @Param('username') username: string,
+  //   @Body() messageDto: EditMessageDto,
+  // ) {
+  //   return this.messageService.editAMessage(teamId, username, messageDto);
+  // }
 }
