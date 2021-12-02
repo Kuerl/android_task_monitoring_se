@@ -253,6 +253,7 @@ export class TaskService {
     if (!userTeam || userTeam.memberRole !== MemberRole.Admin) {
       return { effect: false, status: 'Not allow' };
     }
+    this.teamTaskRepository.delete(teamTask);
     return { effect: true, status: 'Delete task successfully' };
   }
 }
