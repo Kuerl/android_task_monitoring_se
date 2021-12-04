@@ -19,17 +19,28 @@ export class MessageService {
   ) {}
 
   async getAllMessageOfATeam(teamId: string): Promise<MessageEntity[]> {
+    const resMsgs = [];
     const teamQuery = await this.teamRepository.findOne({
       where: { pkTeam_Id: teamId },
     });
     if (!teamQuery) {
       throw new BadRequestException('Not Found Team');
     }
-    return this.messageRepository.find({
+    const resMsg = await this.messageRepository.find({
       where: {
         team: teamQuery,
       },
+      relations: ['user'],
     });
+    for (let i = 0; i < resMsg.length; i++) {
+      const element = resMsg[i];
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { username, ...notres } = element.user;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { user, message, flag, create_up } = element;
+      resMsgs.push({ message, flag, create_up, username });
+    }
+    return resMsgs;
   }
 
   async createAMessage(

@@ -1,13 +1,13 @@
 import { Logger } from '@nestjs/common';
 import {
-  SubscribeMessage,
+  // SubscribeMessage,
   WebSocketGateway,
-  MessageBody,
+  // MessageBody,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway(4001)
+@WebSocketGateway()
 export class MessageGateway {
   @WebSocketServer()
   websocketsv: Server;
@@ -19,8 +19,8 @@ export class MessageGateway {
     client.emit('connection', 'Connection to the server establish');
   }
 
-  @SubscribeMessage('taskmsg')
-  handleMsgArrive(@MessageBody() message: string) {
-    this.websocketsv.emit('taskmsg', message);
-  }
+  // @SubscribeMessage('taskmsg')
+  // handleMsgArrive(@MessageBody() message: string) {
+  //   this.websocketsv.emit('taskmsg', message);
+  // }
 }

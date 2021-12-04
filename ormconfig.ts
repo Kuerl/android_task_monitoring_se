@@ -2,8 +2,6 @@ import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOpti
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-console.log(process.env.TYPEORM_DATABASE);
-
 const ormconfig: MysqlConnectionOptions = {
   type: 'mysql',
   host: process.env.TYPEORM_HOST,
