@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { TeamUserRepository } from 'src/modules/teams/repositories/team-user.repository';
 import { TeamRepository } from 'src/modules/teams/repositories/team.repositories';
 import { UserRepository } from 'src/modules/users/repositories/user.repository';
-import { MessageDto, ResponseMessageDto } from '../common/dtos/message.dto';
+import { MessageDto } from '../common/dtos/message.dto';
 import { MessageRepository } from '../repositories/message.repository';
 import { plainToClass } from 'class-transformer';
 import { MessageEntity } from '../entities/message.entity';
@@ -47,7 +47,7 @@ export class MessageService {
     teamId: string,
     username: string,
     messageDto: MessageDto,
-  ): Promise<ResponseMessageDto> {
+  ): Promise<any> {
     const teamQuery = await this.teamRepository.findOne({
       where: { pkTeam_Id: teamId },
     });
@@ -71,14 +71,16 @@ export class MessageService {
     messagePlain.user = userQuery;
     messagePlain.team = teamQuery;
     const messageCreate = await this.messageRepository.save(messagePlain);
-    this.messageGateway.websocketsv.emit(teamId, {
-      username: username,
-      message: messageDto.message,
-      flag: messageDto.flag,
-    });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { user, team, pkMessage_Id, ...res } = messageCreate;
-    return res;
+    const a = {
+      message: res.message,
+      flag: res.flag,
+      create_up: res.create_up,
+      username: messageCreate.user.username,
+    };
+    this.messageGateway.websocketsv.emit(teamId, a);
+    return a;
   }
 
   // async editAMessage(
