@@ -15,4 +15,6 @@ export class BaseTaskCreateDto {
   user: string;
 
   color: string;
+
+  done: boolean;
 }

@@ -70,9 +70,9 @@ export class TaskEntity {
   @Column({
     name: 'OnTime',
     type: 'boolean',
-    default: null,
+    default: false,
   })
-  ontime: boolean;
+  done: boolean;
 }
 
 @ChildEntity(TaskEntityType.Personal)
