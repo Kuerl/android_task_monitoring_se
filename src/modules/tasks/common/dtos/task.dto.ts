@@ -13,4 +13,6 @@ export class BaseTaskCreateDto {
   due: Date;
 
   user: string;
+
+  color: string;
 }

@@ -58,6 +58,21 @@ export class TaskEntity {
     nullable: false,
   })
   due: Date;
+
+  @Column({
+    name: 'Color',
+    type: 'varchar',
+    nullable: false,
+    default: '#71B5E3',
+  })
+  color: string;
+
+  @Column({
+    name: 'OnTime',
+    type: 'boolean',
+    default: null,
+  })
+  ontime: boolean;
 }
 
 @ChildEntity(TaskEntityType.Personal)
